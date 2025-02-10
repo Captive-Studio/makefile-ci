@@ -199,6 +199,15 @@ node-format: node-dependencies
 .format:: node-format # Add `npm run test` to `make test`
 
 #
+# Run npm build script (ex: npm run build)
+#
+.PHONY: node-build
+node-build: node-dependencies
+	@$(call log,info,"[NodeJS] Build sources...",1)
+	$(Q)$(NODEJS_RUN) build
+.build:: node-build # Add `npm run build` to `make build`
+
+#
 # Run npm test script (ex: npm run test)
 #
 .PHONY: node-test
