@@ -193,7 +193,7 @@ endif
 #
 .PHONY: node-install
 node-install: node-setup
-	$(Q)$(RM) -f node_modules/.make-state
+	$(Q)$(RM) -f $(NODEJS_STATEFILE)
 	$(Q)$(MAKE) node-dependencies
 .install:: node-install	# Add `npm install` to `make install`
 
