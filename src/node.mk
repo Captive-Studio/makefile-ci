@@ -78,6 +78,8 @@ ifeq ($(NODEJS_PACKAGE_MANAGER),yarn-berry)
 		YARN_CACHE_FOLDER ?= $(PROJECT_CACHE_PATH)/yarn
 		YARN_ENABLE_GLOBAL_CACHE ?= false
 	endif
+export YARN_ENABLE_GLOBAL_CACHE
+export YARN_CACHE_FOLDER
 else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 # Yarn
 	NODEJS_RUN := yarn run
@@ -96,6 +98,8 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 		YARN_CACHE_FOLDER ?= $(PROJECT_CACHE_PATH)/yarn
 		YARN_ENABLE_GLOBAL_CACHE ?= false
 	endif
+export YARN_ENABLE_GLOBAL_CACHE
+export YARN_CACHE_FOLDER
 else ifeq ($(NODEJS_PACKAGE_MANAGER),pnpm)
 # PNPM
 	NODEJS_RUN := pnpm run
@@ -113,6 +117,7 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),pnpm)
 	ifneq ($(call filter-false,$(CI)),)
 		PNPM_CONFIG_CACHE ?= $(PROJECT_CACHE_PATH)/pnpm
 	endif
+export PNPM_CONFIG_CACHE
 else
 # NPM should be used
 	NODEJS_RUN := npm run
@@ -130,7 +135,16 @@ else
 	ifneq ($(call filter-false,$(CI)),)
 		NPM_CONFIG_CACHE ?= $(PROJECT_CACHE_PATH)/npm
 	endif
+export NPM_CONFIG_CACHE
 endif
+
+# Configure cypress cache folder (only for CI mode)
+ifeq ($(CYPRESS_CACHE_FOLDER),)
+	ifneq ($(call filter-false,$(CI)),)
+		CYPRESS_CACHE_FOLDER := $(PROJECT_CACHE_PATH)/cypress
+	endif
+endif
+export CYPRESS_CACHE_FOLDER
 
 # Create make cache directory
 $(NODEJS_CACHE_PATH):
