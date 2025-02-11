@@ -35,22 +35,23 @@ export RUBY_VERSION
 BUNDLER_VERSION ?= $(shell if [ -e Gemfile.lock ]; then grep "BUNDLED WITH" Gemfile.lock -A 1 | grep -v "BUNDLED WITH" | tr -d "[:space:]"; else echo ""; fi)
 ## Bundler gem installation path
 BUNDLE_PATH ?=
+ifneq ($(call filter-false,$(CI)),)
+	BUNDLE_PATH ?= vendor/bundle
+endif
+export BUNDLE_PATH
 ## Bundle `install` will exit with error if Gemfile.lock is not up to date
 BUNDLE_FROZEN ?=
+ifneq ($(call filter-false,$(CI)),)
+	BUNDLE_FROZEN ?= true
+endif
+export BUNDLE_FROZEN
 ## Bundle `install` will force platform
 BUNDLE_FORCE_RUBY_PLATFORM ?=
+export BUNDLE_FORCE_RUBY_PLATFORM
 
 BUNDLE_INSTALL := ${BUNDLE} install
 RUBOCOP := ${BUNDLE} exec rubocop
 RAKE := ${BUNDLE} exec rake
-
-ifneq ($(call filter-false,$(CI)),)
-	BUNDLE_FROZEN ?= true
-	BUNDLE_PATH ?= vendor/bundle
-endif
-
-# export
-export BUNDLE_FORCE_RUBY_PLATFORM
 
 # Create make cache directory
 $(RUBY_CACHE_PATH):
