@@ -1,8 +1,9 @@
 ## NodeJS cache path (default: .cache/node)
 NODEJS_CACHE_PATH ?= $(PROJECT_CACHE_PATH)/node
 
+.NODEJS_VERSION_MANAGER := $(call resolve-command,asdf nvm nodenv)
 ## NodeJS version manager used to install node (asdf, nvm, ...)
-NODEJS_VERSION_MANAGER ?= $(call resolve-command,asdf nvm nodenv)
+NODEJS_VERSION_MANAGER ?= $(.NODEJS_VERSION_MANAGER)
 
 ## NodeJS package manager (npm,pnpm,yarn,yarn-berry)
 NODEJS_PACKAGE_MANAGER ?=
@@ -10,18 +11,18 @@ NODEJS_PACKAGE_MANAGER ?=
 ifeq ($(NODEJS_PACKAGE_MANAGER),)
 	ifneq ($(wildcard yarn.lock),)
 		ifneq ($(wildcard .yarnrc.yml),)
-			NODEJS_PACKAGE_MANAGER = yarn-berry
-			NODEJS_PACKAGE_MANAGER_COMMAND = yarn
+			NODEJS_PACKAGE_MANAGER := yarn-berry
+			NODEJS_PACKAGE_MANAGER_COMMAND := yarn
 		else
-			NODEJS_PACKAGE_MANAGER = yarn
-			NODEJS_PACKAGE_MANAGER_COMMAND = yarn
+			NODEJS_PACKAGE_MANAGER := yarn
+			NODEJS_PACKAGE_MANAGER_COMMAND := yarn
 		endif
 	else ifneq ($(wildcard pnpm-lock.yaml),)
-		NODEJS_PACKAGE_MANAGER = pnpm
-		NODEJS_PACKAGE_MANAGER_COMMAND = pnpm
+		NODEJS_PACKAGE_MANAGER := pnpm
+		NODEJS_PACKAGE_MANAGER_COMMAND := pnpm
 	else
-		NODEJS_PACKAGE_MANAGER = npm
-		NODEJS_PACKAGE_MANAGER_COMMAND = npm
+		NODEJS_PACKAGE_MANAGER := npm
+		NODEJS_PACKAGE_MANAGER_COMMAND := npm
 	endif
 endif
 
@@ -37,11 +38,11 @@ NODEJS_VERSION ?=
 # Detect nodejs version
 ifeq ($(NODEJS_VERSION),)
 	ifneq ($(wildcard .tool-versions),)
-		NODEJS_VERSION = $(shell cat .tool-versions | grep nodejs | awk '{print $$2}')
+		NODEJS_VERSION := $(shell cat .tool-versions | grep nodejs | awk '{print $$2}')
 	else ifneq ($(wildcard .node-version),)
-		NODEJS_VERSION = $(shell cat .node-version)
+		NODEJS_VERSION := $(shell cat .node-version)
 	else ifneq ($(wildcard .nvmrc),)
-		NODEJS_VERSION = $(shell cat .nvmrc)
+		NODEJS_VERSION := $(shell cat .nvmrc)
 	endif
 endif
 export NODEJS_VERSION
@@ -68,9 +69,9 @@ ifeq ($(NODEJS_PACKAGE_MANAGER),yarn-berry)
 	NODEJS_STATEFILE := node_modules/.yarn-state.yml
 # Yarn berry frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
-		NODEJS_INSTALL = yarn install --immutable
+		NODEJS_INSTALL := yarn install --immutable
 	else
-		NODEJS_INSTALL = yarn install
+		NODEJS_INSTALL := yarn install
 	endif
 # Yarn berry cache
 	ifneq ($(call filter-false,$(CI)),)
@@ -86,9 +87,9 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 	NODEJS_STATEFILE := node_modules/.yarn-state.yml
 # Yarn frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
-		NODEJS_INSTALL = yarn install --frozen-file
+		NODEJS_INSTALL := yarn install --frozen-file
 	else
-		NODEJS_INSTALL = yarn install
+		NODEJS_INSTALL := yarn install
 	endif
 # Yarn cache
 	ifneq ($(call filter-false,$(CI)),)
@@ -104,9 +105,9 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),pnpm)
 	NODEJS_STATEFILE := node_modules/.modules.yaml
 # PNPM frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
-		NODEJS_INSTALL = pnpm install --frozen-file
+		NODEJS_INSTALL := pnpm install --frozen-file
 	else
-		NODEJS_INSTALL = pnpm install
+		NODEJS_INSTALL := pnpm install
 	endif
 # PNPM cache
 	ifneq ($(call filter-false,$(CI)),)
@@ -121,9 +122,9 @@ else
 	NODEJS_STATEFILE := node_modules/.package-lock.json
 # NPM frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
-		NODEJS_INSTALL = npm ci
+		NODEJS_INSTALL := npm ci
 	else
-		NODEJS_INSTALL = npm install
+		NODEJS_INSTALL := npm install
 	endif
 # NPM cache
 	ifneq ($(call filter-false,$(CI)),)
