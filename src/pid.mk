@@ -10,7 +10,7 @@ MAKE_PIDFILE := $(MAKE_CACHE_PATH)/pid
 $(MAKE_PIDFILE): FORCE
 # Write pid file only if changed.
 	$(Q)echo "$(MAKE_PPID)" | cmp -s - $@ || \
-		(echo "$(MAKE_PPID)" > $@ && \
+		($(MKDIRP) $(dir $@) && echo "$(MAKE_PPID)" > $@ && \
 			$(call log,debug,[Make] MAKE_PID=$(MAKE_PPID) saved to "$@",0) \
 		)
 
