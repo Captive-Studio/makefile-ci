@@ -5,7 +5,7 @@ VERSION_DEFAULT := 1.0.0-alpha.0
 VERSION_FILE := VERSION
 
 ## Source code version
-VERSION ?= $(shell cat $(VERSION_FILE))
+VERSION ?= $(shell cat $(VERSION_FILE) 2>/dev/null)
 
 # Target to generate default version file
 $(VERSION_FILE): FORCE
