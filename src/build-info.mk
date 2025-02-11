@@ -25,7 +25,7 @@ $(CI_BUILD_NUMBER_FILE): $(MAKE_PIDFILE)
 	@:
 
 ## A unique identifier for this build, it can be used in ios, android version number
-CI_BUILD_NUMBER ?= $(shell cat $(CI_BUILD_NUMBER_FILE))
+CI_BUILD_NUMBER ?= $(shell cat $(CI_BUILD_NUMBER_FILE) 2>/dev/null)
 
 # Target that will create the current build number
 # WARNING: this implementation will recreate a new build number for every new make command
@@ -41,7 +41,7 @@ CI_BUILD_VERSION_TEMPLATE ?= $(VERSION)+$(CI_COMMIT_SHORT_SHA)
 CI_BUILD_VERSION_FILE := $(MAKE_CACHE_PATH)/build-version
 
 ## Unique build version (ex: 1.0.0+8fe0f61)
-CI_BUILD_VERSION ?= $(shell cat $(CI_BUILD_VERSION_FILE))
+CI_BUILD_VERSION ?= $(shell cat $(CI_BUILD_VERSION_FILE) 2>/dev/null)
 
 # Target that will create the current build number only if needed
 $(CI_BUILD_VERSION_FILE): $(VERSION_FILE) $(CI_BUILD_NUMBER_FILE) FORCE
