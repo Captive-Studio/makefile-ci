@@ -62,6 +62,10 @@ endif
 ifeq ($(NODEJS_PACKAGE_MANAGER),yarn-berry)
 # Yarn berry
 	NODEJS_RUN := yarn run
+# Lockfile
+	NODEJS_LOCKFILE := yarn.lock
+# State file
+	NODEJS_STATEFILE := node_modules/.yarn-state.yml
 # Yarn berry frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
 		NODEJS_INSTALL = yarn install --immutable
@@ -76,6 +80,10 @@ ifeq ($(NODEJS_PACKAGE_MANAGER),yarn-berry)
 else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 # Yarn
 	NODEJS_RUN := yarn run
+# Lockfile
+	NODEJS_LOCKFILE := yarn.lock
+# State file
+	NODEJS_STATEFILE := node_modules/.yarn-state.yml
 # Yarn frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
 		NODEJS_INSTALL = yarn install --frozen-file
@@ -90,6 +98,10 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 else ifeq ($(NODEJS_PACKAGE_MANAGER),pnpm)
 # PNPM
 	NODEJS_RUN := pnpm run
+# Lockfile
+	NODEJS_LOCKFILE := pnpm-lock.yaml
+# State file
+	NODEJS_STATEFILE := node_modules/.modules.yaml
 # PNPM frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
 		NODEJS_INSTALL = pnpm install --frozen-file
@@ -103,6 +115,10 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),pnpm)
 else
 # NPM should be used
 	NODEJS_RUN := npm run
+# Lockfile
+	NODEJS_LOCKFILE := package-lock.json
+# State file
+	NODEJS_STATEFILE := node_modules/.package-lock.json
 # NPM frozen mode
 	ifneq ($(call filter-false,$(NODEJS_FROZEN)),)
 		NODEJS_INSTALL = npm ci
@@ -124,7 +140,7 @@ $(NODEJS_CACHE_PATH)/node-version: $(NODEJS_CACHE_PATH)
 	$(Q)echo $(NODEJS_VERSION) > $@
 
 # A target that will run node install only if lockfile was changed
-node_modules/.make-state: $(wildcard yarn.lock package-lock.json pnpm-lock.yaml)
+$(NODEJS_STATEFILE): $(wildcard $(NODEJS_LOCKFILE))
 	@$(call log,info,"[NodeJS] Ensure dependencies....",1)
 	$(Q)${NODEJS_INSTALL}
 	$(Q)${TOUCH} $@
@@ -133,7 +149,7 @@ node_modules/.make-state: $(wildcard yarn.lock package-lock.json pnpm-lock.yaml)
 # Install dependencies only if needed
 #
 .PHONY: node-dependencies
-node-dependencies: node-setup node_modules/.make-state
+node-dependencies: node-setup $(NODEJS_STATEFILE)
 .dependencies:: node-dependencies
 
 #
