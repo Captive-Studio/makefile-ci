@@ -53,7 +53,7 @@ dependencies.ci: dependencies.default
 build: build.workflow-run ## Build sources
 build.default: $(call core-hooks,.build)
 build.local: build.default
-# build.ci: build.default # TODO: implement this
+build.ci: build.default
 .build.before::
 	@:
 .build::
