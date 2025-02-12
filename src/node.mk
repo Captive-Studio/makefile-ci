@@ -75,11 +75,9 @@ ifeq ($(NODEJS_PACKAGE_MANAGER),yarn-berry)
 	endif
 # Yarn berry cache
 	ifneq ($(call filter-false,$(CI)),)
-		YARN_CACHE_FOLDER ?= $(PROJECT_CACHE_PATH)/yarn
-		YARN_ENABLE_GLOBAL_CACHE ?= false
+		export YARN_CACHE_FOLDER ?= $(PROJECT_CACHE_PATH)/yarn
+		export YARN_ENABLE_GLOBAL_CACHE ?= false
 	endif
-export YARN_ENABLE_GLOBAL_CACHE
-export YARN_CACHE_FOLDER
 else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 # Yarn
 	NODEJS_RUN := yarn run
@@ -95,11 +93,9 @@ else ifeq ($(NODEJS_PACKAGE_MANAGER),yarn)
 	endif
 # Yarn cache
 	ifneq ($(call filter-false,$(CI)),)
-		YARN_CACHE_FOLDER ?= $(PROJECT_CACHE_PATH)/yarn
-		YARN_ENABLE_GLOBAL_CACHE ?= false
+		export YARN_CACHE_FOLDER ?= $(PROJECT_CACHE_PATH)/yarn
+		export YARN_ENABLE_GLOBAL_CACHE ?= false
 	endif
-export YARN_ENABLE_GLOBAL_CACHE
-export YARN_CACHE_FOLDER
 else ifeq ($(NODEJS_PACKAGE_MANAGER),pnpm)
 # PNPM
 	NODEJS_RUN := pnpm run
