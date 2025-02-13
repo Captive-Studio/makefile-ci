@@ -100,7 +100,7 @@ For existing project, you can check the [CircleCI template](https://github.com/C
 
 ```shell
 # This will checkout makefile-ci in .modules/
-make self-install
+make self-update
 ```
 
 ### Help / Debug
@@ -111,7 +111,15 @@ make self-install
 make help
 ```
 
-#### `make print-variables` : Display all variables and their value
+#### `make print-env` : Display all exported environment variables
+
+```shell
+make print-env
+```
+
+#### `make print-variables` : Display all make flags
+
+This is internal flag used in makefile, it can be exported as environment variable (but not always)
 
 ```shell
 make print-variables
