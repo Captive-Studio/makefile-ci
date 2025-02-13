@@ -193,34 +193,35 @@ DEPLOY_VARIABLES := \
 .PHONY: deploy deploy.default deploy.local deploy.ci $(call core-hooks,.deploy)
 deploy: deploy.workflow-run ## Deploy the application to the given environment
 deploy.default: $(call core-hooks,.deploy)
-deploy.local: .deploy-check
-	$(Q)$(call log,warn,WARNING! This will deploy local files,1)
-	$(Q)read -r -p "Continue? [y/N]" REPLY;echo; \
-	if [[ "$$REPLY" =~ ^[Yy]$$ ]]; then \
-		$(MAKE) deploy.default; \
-	fi
-deploy.ci: .deploy-check
-	$(Q)$(MAKE) deploy.default;
-
-.deploy-check:
-# Display important deploy variables
-	@$(foreach V,$(sort $(CI_VARIABLES) $(DEPLOY_VARIABLES)), \
-		$(if $(filter CI_ENVIRONMENT_NAME,$(V)),\
-			$(if $(filter local,$($V)),\
-				$(call log,error,$V=$($V) (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1),\
-				$(call log,info,$V=$($V),1)\
-			),\
-			$(call log,info,$V=$($V),1)\
-		); \
-	)
-# Stop program if error
-ifeq ($(CI_ENVIRONMENT_NAME),local)
-	@$(call log,fatal,Deployment stopped,1);
-	$(Q)exit 1;
-endif
+deploy.local: deploy.default
+deploy.ci: deploy.default
 
 .deploy.before::
+# Display important deploy variables
+	$(Q)for VARIABLE in $(sort $(CI_VARIABLES) $(DEPLOY_VARIABLES)); do \
+		if [[ "$$VARIABLE" = "CI_ENVIRONMENT_NAME" && "$(shell env $$VARIABLE)" = "local" ]];then \
+			$(call log,error,$$VARIABLE=$(shell env $$VARIABLE) (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1); \
+		else \
+			$(call log,info,$$VARIABLE=$(shell env $$VARIABLE),1); \
+		fi; \
+	done;
+
+# Stop program if CI_ENVIRONMENT_NAME is local
+ifeq ($(CI_ENVIRONMENT_NAME),local)
+	@$(call panic,Deployment stopped,1);
+endif
+
+# Confirmation when CI mode
+ifneq ($(call filter-false,$(CI)),)
+	$(Q)$(call log,warn,WARNING! This will deploy local files,1)
+	$(Q)read -r -p "Continue? [y/N]" REPLY;echo; \
+	if [[ ! "$$REPLY" =~ ^[Yy]$$ ]]; then \
+		$(call panic,Deployment stopped by user,1); \
+	fi
+else
 	@:
+endif
+
 .deploy::
 	@:
 .deploy.after::
