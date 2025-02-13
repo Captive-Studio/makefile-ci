@@ -98,4 +98,4 @@ endif
 # End of all declarations
 
 # Export all CI_VARIABLES
-$(foreach var,$(filter-out CI_BUILD_VERSION_TEMPLATE CI_VARIABLES,$(CI_VARIABLES)),$(eval export $(var)))
+$(foreach var,$(CI_VARIABLES),$(eval export $(var)))
