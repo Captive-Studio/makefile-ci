@@ -214,13 +214,13 @@ endif
 
 # Confirmation when CI mode
 ifneq ($(call filter-false,$(CI)),)
+	@:
+else
 	$(Q)$(call log,warn,WARNING! This will deploy local files,1)
 	$(Q)read -r -p "Continue? [y/N]" REPLY;echo; \
 	if [[ ! "$$REPLY" =~ ^[Yy]$$ ]]; then \
 		$(call panic,Deployment stopped by user,1); \
 	fi
-else
-	@:
 endif
 
 .deploy::
