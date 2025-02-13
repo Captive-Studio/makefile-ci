@@ -199,7 +199,7 @@ deploy.ci: deploy.default
 .deploy.before::
 # Display important deploy variables
 	$(Q)for VARIABLE in $(sort $(CI_VARIABLES) $(DEPLOY_VARIABLES)); do \
-		VALUE="$$(printenv $$VARIABLE)";\
+		VALUE="$$(printenv $$VARIABLE || echo '')";\
 		if [[ "$$VARIABLE" = "CI_ENVIRONMENT_NAME" && "$$VALUE" = "local" ]];then \
 			$(call log,error,$$VARIABLE="$$VALUE" (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1); \
 		else \
