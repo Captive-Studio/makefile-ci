@@ -48,7 +48,7 @@ scalingo-archive:
 # Create a zip from the temporary folder
 	$(Q)tar -czf $(SCALINGO_ARCHIVE_FILE) -C $(SCALINGO_ARCHIVE_FILE).tmp master
 # Remove the temporary folder
- 	$(Q)$(RM) -rf $(SCALINGO_ARCHIVE_FILE).tmp
+	$(Q)$(RM) -rf $(SCALINGO_ARCHIVE_FILE).tmp
 
 #
 # Clean scalingo cache (deploy archives)
