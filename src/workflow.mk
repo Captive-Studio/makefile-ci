@@ -203,17 +203,15 @@ deploy.ci: .deploy-check
 	$(Q)$(MAKE) deploy.default;
 
 .deploy-check:
-# Display CI_PROJECT_NAME
-	@$(call log,info,CI_PROJECT_NAME=$(CI_PROJECT_NAME),1);
-# Check CI_ENVIRONMENT_NAME
-ifeq ($(CI_ENVIRONMENT_NAME),local)
-	@$(call log,error,CI_ENVIRONMENT_NAME=$(CI_ENVIRONMENT_NAME) (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1);
-else
-	@$(call log,info,CI_ENVIRONMENT_NAME=$(CI_ENVIRONMENT_NAME),1);
-endif
 # Display important deploy variables
-	@$(foreach V,$(sort $(DEPLOY_VARIABLES)), \
-		$(call log,info,$V=$($V),1); \
+	@$(foreach V,$(sort $(CI_VARIABLES) $(DEPLOY_VARIABLES)), \
+		$(if $(filter CI_ENVIRONMENT_NAME,$(V)),\
+			$(if $(filter local,$($V)),\
+				$(call log,error,$V=$($V) (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1),\
+				$(call log,info,$V=$($V),1)\
+			),\
+			$(call log,info,$V=$($V),1)\
+		); \
 	)
 # Stop program if error
 ifeq ($(CI_ENVIRONMENT_NAME),local)
