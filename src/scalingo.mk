@@ -37,8 +37,18 @@ scalingo-setup: $(MAKE_CACHE_PATH)/job/scalingo-setup
 .PHONY: scalingo-archive
 scalingo-archive:
 	@$(call log,info,"[Scalingo] Bundle $(SCALINGO_APP)...",1)
-	$(Q)$(MKDIRP) $(dir $(SCALINGO_ARCHIVE_FILE))
-	$(Q)$(GIT) archive --prefix=master/ HEAD | gzip > ${SCALINGO_ARCHIVE_FILE}
+# Ensure previous temporary folder is empty
+	$(Q)$(RM) -rf $(SCALINGO_ARCHIVE_FILE).tmp
+# Create temporary folder containing the archive
+	$(Q)$(MKDIRP) $(SCALINGO_ARCHIVE_FILE).tmp
+# Create an archive folder ready to be zipped
+	$(Q)$(GIT) archive --prefix=master/ HEAD | tar -x -C $(SCALINGO_ARCHIVE_FILE).tmp
+# Dump environment so scalingo will be able to build the app with the same variables
+	$(Q)CI=1 make print-env > $(SCALINGO_ARCHIVE_FILE).tmp/master/$(MAKEFILE_LOCAL)
+# Create a zip from the temporary folder
+	$(Q)tar -czf $(SCALINGO_ARCHIVE_FILE) -C $(SCALINGO_ARCHIVE_FILE).tmp master
+# Remove the temporary folder
+ 	$(Q)$(RM) -rf $(SCALINGO_ARCHIVE_FILE).tmp
 
 #
 # Clean scalingo cache (deploy archives)
