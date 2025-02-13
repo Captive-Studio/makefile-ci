@@ -4,11 +4,9 @@ all: setup dependencies lint ## Run all targets
 #-------------
 # SETUP
 #-------------
-.PHONY: setup setup.default setup.local setup.ci $(call core-hooks,.setup)
-setup: setup.workflow-run ## Install global dependencies and setup the project
-setup.default: $(call core-hooks,.setup)
-setup.local: setup.default
-setup.ci: setup.default
+.PHONY: setup $(call core-hooks,.setup)
+setup: setup.workflow-intro $(call core-hooks,.setup) ## Install global dependencies and setup the project
+
 .setup.before::
 	@:
 .setup::
@@ -19,11 +17,9 @@ setup.ci: setup.default
 #-------------
 # INSTALL
 #-------------
-.PHONY: install install.default install.local install.ci $(call core-hooks,.install)
-install: install.workflow-run ## Install project dependencies (force installation)
-install.default: $(call core-hooks,.install)
-install.local: install.default
-install.ci: install.default
+.PHONY: install $(call core-hooks,.install)
+install: install.workflow-intro $(call core-hooks,.install) ## Install project dependencies (force installation)
+
 .install.before::
 	@:
 .install::
@@ -34,11 +30,9 @@ install.ci: install.default
 #-------------
 # DEPENDENCIES
 #-------------
-.PHONY: dependencies dependencies.default dependencies.local dependencies.ci $(call core-hooks,.dependencies)
-dependencies: dependencies.workflow-run ## Ensure project dependencies are present (install only if needed)
-dependencies.default: $(call core-hooks,.dependencies)
-dependencies.local: dependencies.default
-dependencies.ci: dependencies.default
+.PHONY: dependencies $(call core-hooks,.dependencies)
+dependencies: dependencies.workflow-intro $(call core-hooks,.dependencies) ## Ensure project dependencies are present (install only if needed)
+
 .dependencies.before::
 	@:
 .dependencies::
@@ -49,11 +43,9 @@ dependencies.ci: dependencies.default
 #-------------
 # BUILD
 #-------------
-.PHONY: build build.default build.local build.ci $(call core-hooks,.build)
-build: build.workflow-run ## Build sources
-build.default: $(call core-hooks,.build)
-build.local: build.default
-build.ci: build.default
+.PHONY: build $(call core-hooks,.build)
+build: build.workflow-intro $(call core-hooks,.build) ## Build sources
+
 .build.before::
 	@:
 .build::
@@ -64,11 +56,9 @@ build.ci: build.default
 #-------------
 # CLEAN
 #-------------
-.PHONY: clean clean.default clean.local clean.ci $(call core-hooks,.clean)
-clean: clean.workflow-run ## Clean build files
-clean.default: $(call core-hooks,.clean)
-clean.local: clean.default
-clean.ci: clean.default
+.PHONY: clean $(call core-hooks,.clean)
+clean: clean.workflow-intro $(call core-hooks,.clean) ## Clean build files
+
 .clean.before::
 	@:
 .clean::
@@ -79,11 +69,9 @@ clean.ci: clean.default
 #-------------
 # LINT
 #-------------
-.PHONY: lint lint.default lint.local lint.ci $(call core-hooks,.lint)
-lint: dependencies lint.workflow-run ## Lint all source files
-lint.default: $(call core-hooks,.lint)
-lint.local: lint.default
-lint.ci: lint.default
+.PHONY: lint $(call core-hooks,.lint)
+lint: dependencies lint.workflow-intro $(call core-hooks,.lint) ## Lint all source files
+
 .lint.before::
 	@:
 .lint::
@@ -94,11 +82,9 @@ lint.ci: lint.default
 #-------------
 # FORMAT
 #-------------
-.PHONY: format format.default format.local format.ci $(call core-hooks,.format)
-format: dependencies format.workflow-run ## Format all source files
-format.default: $(call core-hooks,.format)
-format.local: format.default
-format.ci: format.default
+.PHONY: format $(call core-hooks,.format)
+format: dependencies format.workflow-intro $(call core-hooks,.format) ## Format all source files
+
 .format.before::
 	@:
 .format::
@@ -109,11 +95,9 @@ format.ci: format.default
 #-------------
 # TEST
 #-------------
-.PHONY: test test.default test.local test.ci $(call core-hooks,.test)
-test: dependencies test.workflow-run ## Run unit tests
-test.default: $(call core-hooks,.test)
-test.local: test.default
-test.ci: test.default
+.PHONY: test $(call core-hooks,.test)
+test: dependencies test.workflow-intro $(call core-hooks,.test) ## Run unit tests
+
 .test.before::
 	@:
 .test::
@@ -124,11 +108,9 @@ test.ci: test.default
 #-------------
 # TEST SYSTEM (E2E)
 #-------------
-.PHONY: test-e2e test-e2e.default test-e2e.local test-e2e.ci $(call core-hooks,.test-e2e)
-test-e2e: dependencies test-e2e.workflow-run ## Run system tests (e2e)
-test-e2e.default: $(call core-hooks,.test-e2e)
-test-e2e.local: test-e2e.default
-test-e2e.ci: test-e2e.default
+.PHONY: test-e2e $(call core-hooks,.test-e2e)
+test-e2e: dependencies test-e2e.workflow-intro $(call core-hooks,.test-e2e) ## Run system tests (e2e)
+
 .test-e2e.before::
 	@:
 .test-e2e::
@@ -139,13 +121,14 @@ test-e2e.ci: test-e2e.default
 #-------------
 # DEVELOP
 #-------------
-.PHONY: develop develop.default develop.local develop.ci $(call core-hooks,.develop)
-develop: dependencies develop.workflow-run ## Setups a local development environment
-develop.local: $(call core-hooks,.develop)
-develop.ci:
-	@$(call log,warn,"[Develop] Job disabled in CI mode",0)
+.PHONY: develop $(call core-hooks,.develop)
+develop: dependencies develop.workflow-intro $(call core-hooks,.develop) ## Setups a local development environment
+
 .develop.before::
-	@:
+	ifneq ($(call filter-false,$(CI)),)
+		@$(call log,warn,"[Develop] Job disabled in CI mode",0)
+		@exit 0
+	endif
 .develop::
 	@:
 .develop.after::
@@ -162,11 +145,9 @@ develop.ci:
 #
 # MAKEFILE_SCAN_TARGETS += my-target-scan
 #
-.PHONY: scan scan.default scan.local scan.ci $(call core-hooks,.scan)
-scan: scan.workflow-run ## Scan code for potential issues
-scan.default: $(call core-hooks,.scan)
-scan.ci: scan.default
-scan.local: scan.default
+.PHONY: scan $(call core-hooks,.scan)
+scan: scan.workflow-intro $(call core-hooks,.scan) ## Scan code for potential issues
+
 .scan.before::
 	@:
 .scan:
@@ -190,11 +171,8 @@ DEPLOY_VARIABLES := \
 #-------------
 # DEPLOY
 #-------------
-.PHONY: deploy deploy.default deploy.local deploy.ci $(call core-hooks,.deploy)
-deploy: deploy.workflow-run ## Deploy the application to the given environment
-deploy.default: $(call core-hooks,.deploy)
-deploy.local: deploy.default
-deploy.ci: deploy.default
+.PHONY: deploy $(call core-hooks,.deploy)
+deploy: deploy.workflow-intro $(call core-hooks,.deploy) ## Deploy the application to the given environment
 
 .deploy.before::
 # Display important deploy variables
@@ -231,15 +209,14 @@ endif
 #-------------
 # RESCUE
 #-------------
-.PHONY: rescue rescue.default rescue.local rescue.ci $(call core-hooks,.rescue)
-rescue: rescue.workflow-run ## Clean everything in case of problem
-rescue.default: $(call core-hooks,.rescue)
-rescue.local: rescue.default
-rescue.ci:
-	@$(call log,warn,"[Rescue] Job disabled in CI mode",0)
+.PHONY: rescue $(call core-hooks,.rescue)
+rescue: rescue.workflow-intro $(call core-hooks,.rescue) ## Clean everything in case of problem
 
 .rescue.before::
-	@:
+	ifneq ($(call filter-false,$(CI)),)
+		@$(call log,warn,"[Rescue] Job disabled in CI mode",0)
+		@exit 0
+	endif
 .rescue::
 	@:
 .rescue.after::
@@ -263,11 +240,9 @@ rescue.ci:
 #   -> Will run job.local when $(CI) is not set
 #
 ifneq ($(call filter-false,$(CI)),)
-%.workflow-run:
+%.workflow-intro:
 	@$(call log,info,"[Make] $* \(mode=CI\)")
-	@${MAKE} $*.ci
 else
-%.workflow-run:
+%.workflow-intro:
 	@$(call log,info,"[Make] $* \(mode=Local\)")
-	@${MAKE} $*.local
 endif
