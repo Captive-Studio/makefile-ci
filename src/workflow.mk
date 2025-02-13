@@ -201,9 +201,9 @@ deploy.ci: deploy.default
 	$(Q)for VARIABLE in $(sort $(CI_VARIABLES) $(DEPLOY_VARIABLES)); do \
 		VALUE="$$(printenv $$VARIABLE)";\
 		if [[ "$$VARIABLE" = "CI_ENVIRONMENT_NAME" && "$$VALUE" = "local" ]];then \
-			$(call log,error,$$VARIABLE=$$VALUE (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1); \
+			$(call log,error,$$VARIABLE="$$VALUE" (forbidden value, use CI_ENVIRONMENT_NAME=<environment> make deploy),1); \
 		else \
-			$(call log,info,$$VARIABLE=$$VALUE,1); \
+			$(call log,info,$$VARIABLE="$$VALUE",1); \
 		fi; \
 	done;
 
