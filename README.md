@@ -91,14 +91,9 @@ For existing project, you can check the [CircleCI template](https://github.com/C
 
 ## Usage
 
-### Bootstrap / Update repository
+### Update make modules
 
-#### `make self-install` : Install makefile-ci
-
-> [!IMPORTANT]
-> This command is required just after `git clone` any project using makefile-ci
-
-#### `make self-update` : Update makefile-ci
+#### `make self-update` : Update makefile-ci makefiles
 
 > [!IMPORTANT]
 > Do not forget to commit changes
