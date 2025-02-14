@@ -117,6 +117,14 @@ make help
 make print-env
 ```
 
+> [!HINT]
+>
+> You can also use make print-env to dump all environment and restore in another place / moment.
+>
+> ```shell
+> make print-env > Makefile.local # This file will be loaded by makefile-core
+> ```
+
 #### `make print-variables` : Display all make flags
 
 This is internal flag used in makefile, it can be exported as environment variable (but not always)
@@ -144,6 +152,28 @@ CI=1 make lint
 #### `make lint` : Run all linters (ESLint, rubocop, etc)
 
 #### `make scan` : Scan code for issues (xeol, etc)
+
+### Versionning an app
+
+#### `make build-version` : Display build version
+
+> [!HINT]
+>
+> Customization of `CI_BUILD_VERSION can be done by changing `CI_BUILD_VERSION_TEMPLATE`
+>
+> ```makefile
+> CI_BUILD_VERSION_TEMPLATE ?= $(VERSION).$(CI_PIPELINE_CREATED_AT).foo.bar
+> ```
+
+> [!HINT]
+>
+> `CI_BUILD_VERSION` will be automatically created / updated before each workflow target (build, lint, print-env, etc)
+
+> [!WARNING]
+>
+> In the CI, your version is changing ? (because you added a timestamp or a random id). 
+>
+> To keep the version for each job of the same pipeline, you have to save the version files in `.cache/make in the cache / artifact OR dump using something like `make print-env > Makefile.local (This specific file is automatically loaded by makefile-core and enables to override any defined variable)
 
 ### Deploy
 
